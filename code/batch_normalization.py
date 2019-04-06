@@ -5,10 +5,10 @@ import random
 
 # hyperparameters
 alpha = 1.0
-margin = 5.0
+margin = 1.0
 batch_size = 100
-learning_rate = 1e-4
-num_iteration = 350
+learning_rate = 1e-1
+num_iteration = 1000
 
 def get_next_batch(step,num_fullbatch,num_training_ex):
 	step = step%(num_fullbatch+1)
@@ -18,10 +18,12 @@ def get_next_batch(step,num_fullbatch,num_training_ex):
 	return range(step*batch_size,(step+1)*batch_size)
 
 def datapreprocessing(train_x,test_x):
-	mean_x = np.mean(train_x,axis=0)
-	std_x = np.std(train_x,axis=0)
-	train_x = (train_x - mean_x)/std_x
-	test_x = (test_x - mean_x)/std_x
+	train_x = train_x.reshape(train_x.shape[0],3,32,32).transpose(0,2,3,1)
+	test_x = test_x.reshape(test_x.shape[0],3,32,32).transpose(0,2,3,1)
+	# mean_x = np.mean(train_x,axis=0)
+	# std_x = np.std(train_x,axis=0)
+	# train_x = (train_x - mean_x)/std_x
+	# test_x = (test_x - mean_x)/std_x
 	return train_x,test_x
 
 def weight_variable(shape):
@@ -82,13 +84,16 @@ def training(train_x, train_y, test_x, test_y):
 
 			print('Step:{}, Loss:{}'.format(step, batch_loss))
 
-		# print('Calculating the training accuracy')
-		# training_output = sess.run(output,feed_dict={input_placeholder:train_x})
-		# prediction = np.argmax(training_output,axis=1)
-		# training_accuracy = sess.run(accuracy,feed_dict={label_placeholder:train_y,predicted_labels:prediction})
-		# print("Training Accuracy :",training_accuracy)
+		print('Calculating the training accuracy')
+		training_output = sess.run(output,feed_dict={input_placeholder:train_x})
+		prediction = np.argmax(training_output,axis=1)
+		# print(prediction)
+		training_accuracy = sess.run(accuracy,feed_dict={label_placeholder:train_y,predicted_labels:prediction})
+		print("Training Accuracy :", training_accuracy)
 
 if __name__ == '__main__':
 	dataset = datahelpers.data_cifar10()
 	dataset['training_features'],dataset['test_features'] = datapreprocessing(dataset['training_features'],dataset['test_features'])
-	training(dataset['training_features'],dataset['training_labels'],dataset['test_features'],dataset['test_labels'])
+	# print(np.mean(dataset['test_features']), np.std(dataset['test_features']))
+	# training(dataset['training_features'],dataset['training_labels'],dataset['test_features'],dataset['test_labels'])
+	print(np.unique(dataset['training_labels']))

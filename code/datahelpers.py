@@ -22,4 +22,5 @@ def data_cifar10():
 	test_data = unpickle(dataset_folder+test_filename)
 	dataset['test_features'] = test_data['data']
 	dataset['test_labels'] = np.array(test_data['labels'])
+	dataset['label_names'] = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 	return dataset
